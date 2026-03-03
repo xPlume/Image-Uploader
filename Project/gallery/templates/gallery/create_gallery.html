@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% load static %}
+
+
+
+
+{% block content %}
+	
+	
+	<div class="mt-4"></div>
+	
+	<!-- Form start -->
+	<form method="POST" enctype="multipart/form-data">
+		{% csrf_token %}
+		
+		<div class="container">
+			
+			<legend class="mb-2">Creating a new Gallery</legend>
+			
+			<!-- Title -->
+			<div class="form-floating mb-3">
+				<input required name="title" type="text" placeholder="Title" class="form-control">
+				<label class="ps-4" for="floatingInput">Title</label>
+			</div>
+			
+			
+			<!-- Submit button -->
+			<div class="container mb-5">
+				<button type="submit" class="btn btn-lg btn-outline-primary mt-5">Save</button>
+			</div>
+		
+	</form>
+	<!-- Form end -->
+	
+{% endblock %}

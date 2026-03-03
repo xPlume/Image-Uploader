@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% load static %}
+
+
+{% block head_block %}
+	
+	<meta name="description" content="Simple gallery preview.">
+	
+{% endblock %}
+
+
+
+{% block header %}
+	
+	
+{% endblock %}
+
+
+
+
+{% block content %}
+	
+	
+	
+	<!-- Create new gallery Button -->
+	<a href="{% url 'create_gallery' %}">
+		<button class="btn btn-lg btn-primary position-fixed bottom-0 end-0 m-5" style="z-index: 100;">
+			Create a new gallery
+		</button>
+	</a>
+	
+	
+	
+	<!-- Breadcrumbs -->
+	<div class="mt-3"></div>
+	<nav aria-label="breadcrumb mt-3">
+		<ol class="breadcrumb justify-content-center">
+			<li class="breadcrumb-item active" aria-current="page">Home</li>
+		</ol>
+	</nav>
+	<!-- Breadcrumbs END -->
+	
+	
+	<div class="text-center my-4">
+		<h1>Existing Galleries</h1>
+	</div>
+	
+	<div class="container text-center">
+		{% for gallery in all_galleries %}
+			
+			<a class="list-group mt-2" href="{% url 'gallery' gallery.id %}" style="text-decoration: none; color: inherit;">
+				
+				<li class="list-group-item d-flex justify-content-between align-items-center my-2">
+					<h5 class="modal-title container">
+						{{ gallery.title }}
+					</h5>
+				</li>
+				
+			</a>
+			
+		{% empty %}
+			<h1 class="display-6 mt-2"></h1>
+			<p class="lead text-secondary-emphasis">No galleries were yet published.</p>
+		{% endfor %}
+	</div>
+	
+{% endblock %}

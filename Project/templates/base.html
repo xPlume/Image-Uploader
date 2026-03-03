@@ -1,0 +1,80 @@
+{% load static %}
+
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Better Image Uploader</title>
+	
+	
+	<!-- Favicon -->
+	<link href="{% static 'img/favicon-l.webp' %}" rel="icon">
+	
+	
+	
+	<!-- Core theme CSS -->
+	<link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}"/>
+	
+	
+	
+	
+	{% block head_block %}
+		
+		
+		
+	{% endblock %}
+	
+	
+</head>
+
+
+<body>
+	
+	<style>
+		body {
+			overflow-x: hidden;
+		}
+	</style>
+	
+	
+	
+	<!-- Displaying messages -->
+	{% include "display_messages.html" %}
+	
+	
+	{% block content %}
+		
+		
+		
+		
+	{% endblock %}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	<!-- JavaScript Libraries -->
+		
+		<!-- Bootstrap JS Bundle -->
+	<script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+	
+		<!-- Custom Javascript -->
+	<script src="{% static 'js/add_on_js.js' %}"></script>
+	
+	
+	
+	
+	
+	
+</body>
+
+</html>
