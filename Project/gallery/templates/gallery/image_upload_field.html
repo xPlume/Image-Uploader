@@ -1,0 +1,169 @@
+<style>
+	.galleryimg {
+		position: relative;
+		overflow: hidden;
+		margin: 5px;
+		border: 1px solid #ddd;
+		border-radius: .25rem;
+		background: #f8f9fa;
+	}
+	.galleryimg img {
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+	}
+	.galleryimg .remove-btn {
+		position: absolute;
+		top: 4px;
+		right: 4px;
+		background: rgba(220, 53, 69, 0.9);
+		color: #fff;
+		border: none;
+		border-radius: 50%;
+		width: 24px;
+		height: 24px;
+		font-size: 16px;
+		line-height: 20px;
+		text-align: center;
+		cursor: pointer;
+		z-index: 10;
+	}
+	#preview-container {
+		display: flex;
+		flex-wrap: wrap;
+	}
+</style>
+
+
+<form method="post" enctype="multipart/form-data" id="gallery-form">
+	{% csrf_token %}
+	
+	<!-- Preview container -->
+	<div id="preview-container" class="mt-3 d-flex flex-wrap gap-2"></div>
+	
+	
+	<!-- Hidden file input (initially empty) -->
+	<input type="file" id="new_images" name="new_images" accept="image/*" multiple class="d-none" />
+
+	<!-- Add Images button -->
+	<button type="button" id="add-images-btn" class="btn btn-outline-primary mt-3">
+		&#65291; Add Images
+	</button>
+	
+	<!-- Hidden fields for JSON data; note they start as [] -->
+	<input type="hidden" name="remove_ids" id="remove_ids" value="[]" />
+	<input type="hidden" name="order" id="order" value="[]" />
+	
+	
+	<!-- Save button -->
+	<div class="mt-4">
+		<button type="submit" class="btn btn-lg btn-success">
+			Save Changes
+		</button>
+	</div>
+	
+</form>
+
+
+
+<script>
+	(function() {
+		// ——— 1) Prepare data & nodes ———————————————————
+		const existing = JSON.parse('{{ existing_images_json|escapejs }}');
+		const preview = document.getElementById('preview-container');
+		const fileInput = document.getElementById('new_images');
+		const removeIds = [];
+		let newFiles = [];
+		let nextTempIndex = 0;
+		
+		// ——— 2) Button to trigger file selector —————————
+		document.getElementById('add-images-btn')
+		.addEventListener('click', () => fileInput.click());
+		
+		// ——— 3) galleryimgnail helper ———————————————
+		function makegalleryimg({ src, id, temp_index }) {
+			const div = document.createElement('div');
+			div.className = 'galleryimg';
+			if (id) div.dataset.id = id;
+			if (temp_index !== undefined) div.dataset.tempIndex = temp_index;
+			
+			const img = document.createElement('img');
+			img.src = src;
+			div.appendChild(img);
+			
+			const btn = document.createElement('button');
+			btn.type = 'button';
+			btn.innerHTML = '&times;';
+			btn.className = 'remove-btn';
+			btn.addEventListener('click', () => removegalleryimg(div));
+			div.appendChild(btn);
+			
+			return div;
+		}
+		
+		// ——— 4) Remove helper ————————————————
+		function removegalleryimg(div) {
+			if (div.dataset.id) {
+				removeIds.push(parseInt(div.dataset.id, 10));
+			} else if (div.dataset.tempIndex) {
+				const idx = parseInt(div.dataset.tempIndex, 10);
+				newFiles = newFiles.filter(n => n.tempIndex !== idx);
+			}
+			div.remove();
+		}
+		
+		// ——— 5) Load existing images —————————————
+		existing
+		.sort((a, b) => a.order - b.order)
+		.forEach(img => preview.appendChild(
+			makegalleryimg({ src: img.url, id: img.id })
+		));
+		
+		// ——— 6) Make sortable —————————————————————
+		new Sortable(preview, { animation: 150 });
+		
+		// ——— 7) Handle new file selection ——————————
+		fileInput.addEventListener('change', e => {
+			for (const file of Array.from(e.target.files)) {
+				const reader = new FileReader();
+				const tempIndex = nextTempIndex++;
+				newFiles.push({ tempIndex, file });
+			
+				reader.onload = ev => preview.appendChild(
+					makegalleryimg({ src: ev.target.result, temp_index: tempIndex })
+				);
+				reader.readAsDataURL(file);
+			}
+			// Clear the input so users can re-add the same filename later
+			fileInput.value = '';
+		});
+		
+		// ——— 8) On submit ————————————————————————
+		document.getElementById('gallery-form')
+		.addEventListener('submit', () => {
+			// a) Rebuild FileList in fileInput
+			const dt = new DataTransfer();
+			newFiles.forEach(n => dt.items.add(n.file));
+			fileInput.files = dt.files;
+		
+			// b) Build order JSON from DOM order
+			const orderList = [];
+			preview.querySelectorAll('.galleryimg')
+			.forEach(div => {
+				if (div.dataset.id) {
+					orderList.push({ id: parseInt(div.dataset.id, 10) });
+				} else if (div.dataset.tempIndex) {
+					orderList.push({ temp_index: parseInt(div.dataset.tempIndex, 10) });
+				}
+			});
+		
+			// c) Write hidden fields
+			document.getElementById('remove_ids').value = JSON.stringify(removeIds);
+			document.getElementById('order').value      = JSON.stringify(orderList);
+			// d) No e.preventDefault(): allow normal Django POST+redirect
+		});
+	})();
+</script>
