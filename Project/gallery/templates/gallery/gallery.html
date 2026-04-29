@@ -72,11 +72,9 @@
 				
 				<!-- Images -->
 				<div class="col-lg-3 col-sm-4 col-6 p-1">
-					<a href="#" class="portfolio-link" data-bs-toggle="modal" data-index="{{ forloop.counter0 }}" data-image-url="{{ image.image.url }}" onclick="openImageModal(this)">
-						<div class="rounded square-container zoom-in">
-							<img class="" src="{{ image.image.url }}">
-						</div>
-					</a>
+					<div class="rounded square-container zoom-in">
+						<img class="" src="{{ image.image.url }}">
+					</div>
 				</div>
 				
 			{% endfor %}

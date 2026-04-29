@@ -3,7 +3,7 @@ import os
 
 from gallery.models import Gallery
 
-# Saving the images in a specific folder: ~/[gallery.id]-[gallery.title] / [img_name]
+# Saving the images in a specific folder: ~/[gallery.id]-[gallery.title] / [img_name].[png]
 def specific_folder(instance, filename):
 	sanitized_title = ''.join(e for e in instance.gallery.title if e.isalnum())
 	return os.path.join('gallery', f"{instance.gallery.id}-{sanitized_title}", filename)
